@@ -1,24 +1,24 @@
 ---
 - name: Download the SHA256 sums
   get_url:
-    url: "https://cdimage.ubuntu.com/ubuntu-server/focal/daily-live/current/SHA256SUMS"
+    url: "https://cdimage.ubuntu.com/ubuntu-server/{{ ubuntu_codename }}/daily-live/current/SHA256SUMS"
     dest: "{{ target_dir }}"
 
 - name: Get the SHA256 sum for the {{ iso_arch }} ISO
   shell:
-    cmd: "grep {{ iso_arch }} {{ target_dir }}/SHA256SUMS | cut -d ' ' -f1"
+    cmd: "grep {{ iso_arch }}.iso {{ target_dir }}/SHA256SUMS | cut -d ' ' -f1"
   changed_when: false
   register: sha256sum
 
-- name: Download the latest Ubuntu Server 20.04 {{ iso_arch }} ISO
+- name: Download the latest Ubuntu Server {{ ubuntu_codename }} {{ iso_arch }} ISO
   get_url:
-    url: "https://cdimage.ubuntu.com/ubuntu-server/focal/daily-live/current/focal-live-server-{{ iso_arch }}.iso"
-    dest: "{{ target_dir }}/focal-live-server-{{ iso_arch }}.iso"
+    url: "https://cdimage.ubuntu.com/ubuntu-server/{{ ubuntu_codename }}/daily-live/current/{{ ubuntu_codename }}-live-server-{{ iso_arch }}.iso"
+    dest: "{{ target_dir }}/{{ ubuntu_codename }}-live-server-{{ iso_arch }}.iso"
     checksum: "sha256:{{ sha256sum.stdout }}"
 
 - name: Download the GPG keys
   get_url:
-    url: "https://cdimage.ubuntu.com/ubuntu-server/focal/daily-live/current/SHA256SUMS.gpg"
+    url: "https://cdimage.ubuntu.com/ubuntu-server/{{ ubuntu_codename }}/daily-live/current/SHA256SUMS.gpg"
     dest: "{{ target_dir }}"
 
 - name: Check if dirmngr is running

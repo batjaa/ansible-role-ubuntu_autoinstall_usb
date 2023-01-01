@@ -1,13 +1,15 @@
 ---
 locale: "en-us.UTF-8"
 
+ubuntu_codename: "jammy"
+
 iso_arch: "amd64"
 # Valid values are: amd64, arm64
 # ppc64el and s390x haven't been tested yet
 
 keyboard_layout: "us"
 
-hostname: "focal-autoinstall"
+hostname: "jammy-autoinstall"
 
 password: "ubuntu"
 
@@ -15,7 +17,7 @@ username: "ubuntu"
 
 ssh_public_key: ""
 
-pikvm_address: "pikvm.box"
+pikvm_address: ""
 
 pikvm_username: "admin"
 
@@ -25,8 +27,10 @@ target_dir: "{{ ansible_env.HOME }}/.local/ansible_ubuntu-autoinstall"
 
 ubuntu_gpg_key: 843938DF228D22F7B3742BC0D94AA3F0EFE21092
 
-enable_pikvm: false
+enable_pikvm: true
 
 enable_hwe_kernel: false
 
 enable_swap_file: false
+
+boot_drive_serial: ""

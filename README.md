@@ -26,3 +26,16 @@
 
 
 Other variables are more or less self-explanatory and can be found in defaults/main.yml
+
+
+### Prerequisite
+
+Install python passlib module
+
+`pip3 install passlib`
+
+###
+
+Guide for generating auto install iso: https://www.pugetsystems.com/labs/hpc/ubuntu-22-04-server-autoinstall-iso/#Step_5_Generate_a_new_Ubuntu_2204_server_autoinstall_ISO
+
+Jammy auto install configuration: https://www.molnar-peter.hu/en/ubuntu-jammy-netinstall-pxe.html

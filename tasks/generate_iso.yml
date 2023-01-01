@@ -6,7 +6,7 @@
 
 - name: Extract the ISO
   shell:
-    cmd: "xorriso -osirrox on -indev {{ target_dir }}/focal-live-server-{{ iso_arch }}.iso -extract / {{ target_dir }}/iso"
+    cmd: "xorriso -osirrox on -indev {{ target_dir }}/{{ ubuntu_codename }}-live-server-{{ iso_arch }}.iso -extract / {{ target_dir }}/iso"
 
 - name: Fix extracted ISO mode
   file:
@@ -15,10 +15,10 @@
     recurse: yes
     follow: no
 
-- name: Delete the [BOOT] folder
-  file:
-    path: "{{ target_dir }}/iso/[BOOT]"
-    state: absent
+# - name: Delete the [BOOT] folder
+#   file:
+#     path: "{{ target_dir }}/iso/[BOOT]"
+#     state: absent
 
 - name: Enable HWE kernel in ISOLinux bootloader
   replace:
@@ -39,14 +39,14 @@
     - "{{ target_dir }}/iso/boot/grub/loopback.cfg"
   when: enable_hwe_kernel | default(False)
 
-- name: Add the autoinstall parameter to the ISOLinux bootloader
-  replace:
-    path: "{{ item }}"
-    regexp: "---$"
-    replace: " autoinstall   ds=nocloud;s=/cdrom/nocloud/  ---"
-  with_items:
-    - "{{ target_dir }}/iso/isolinux/txt.cfg"
-  when: iso_arch == 'amd64'
+# - name: Add the autoinstall parameter to the ISOLinux bootloader
+#   replace:
+#     path: "{{ item }}"
+#     regexp: "---$"
+#     replace: " autoinstall   ds=nocloud;s=/cdrom/nocloud/  ---"
+#   with_items:
+#     - "{{ target_dir }}/iso/isolinux/txt.cfg"
+#   when: iso_arch == 'amd64'
 
 - name: Add the autoinstall parameter to the GRUB bootloader
   replace:
@@ -81,7 +81,7 @@
   with_items:
     - "{{ target_dir }}/iso/boot/grub/grub.cfg"
     - "{{ target_dir }}/iso/boot/grub/loopback.cfg"
-    - "{{ target_dir }}/iso/isolinux/txt.cfg"
+#    - "{{ target_dir }}/iso/isolinux/txt.cfg"
   register: md5sums
 
 - name: Write the new MD5 hash (grub.cfg)
@@ -96,16 +96,16 @@
     search_string: loopback.cfg
     path: "{{ target_dir }}/iso/md5sum.txt"
 
-- name: Write the new MD5 hash (isolinux/txt.cfg)
-  lineinfile:
-    line: "{{ md5sums.results[2].stat.checksum }}  ./isolinux/txt.cfg"
-    search_string: isolinux/txt.cfg
-    path: "{{ target_dir }}/iso/md5sum.txt"
-  when: iso_arch == 'amd64'
+# - name: Write the new MD5 hash (isolinux/txt.cfg)
+#   lineinfile:
+#     line: "{{ md5sums.results[2].stat.checksum }}  ./isolinux/txt.cfg"
+#     search_string: isolinux/txt.cfg
+#     path: "{{ target_dir }}/iso/md5sum.txt"
+#   when: iso_arch == 'amd64'
 
 - name: Repack the ISO (amd64)
   shell:
-    cmd: "cd {{ target_dir }}/iso && xorriso -as mkisofs -quiet -D -r -V ubuntu-autoinstall_{{ iso_arch }} -cache-inodes -J -l -joliet-long -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot -o {{ target_dir }}/ubuntu_autoinstall_{{ iso_arch }}.iso ."
+    cmd: "cd {{ target_dir }}/iso && xorriso -as mkisofs -quiet -D -r -V ubuntu-autoinstall_{{ iso_arch }} -o {{ target_dir }}/ubuntu_autoinstall_{{ iso_arch }}.iso --grub2-mbr --interval:local_fs:0s-15s:zero_mbrpt,zero_gpt:'{{ target_dir }}/{{ ubuntu_codename }}-live-server-{{ iso_arch }}.iso' -partition_offset 16 --mbr-force-bootable -append_partition 2 28732ac11ff8d211ba4b00a0c93ec93b --interval:local_fs:2954896d-2963391d::'{{ target_dir }}/{{ ubuntu_codename }}-live-server-{{ iso_arch }}.iso' -appended_part_as_gpt -iso_mbr_part_type a2a0d0ebe5b9334487c068b6b72699c7 -c boot.catalog -b '/boot/grub/i386-pc/eltorito.img' -no-emul-boot -boot-load-size 4 -boot-info-table --grub2-boot-info -eltorito-alt-boot -e '--interval:appended_partition_2_start_738724s_size_8496d:all::' -no-emul-boot ."
   when: iso_arch == 'amd64'
 
 
